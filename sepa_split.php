@@ -39,7 +39,8 @@ $doc_count = count($dests);
 for ($i = 0; $i < $n; $i++) {
     echo "$i\r";
     flush();
-    $checksums[$i % $doc_count]["montant"] += getMontant($paiements->item($i));
+//    echo " {$checksums[$i % $doc_count]["montant"]} += ".getMontant($paiements->item($i))." \n";
+    $checksums[$i % $doc_count]["montant"] = bcadd($checksums[$i % $doc_count]["montant"], getMontant($paiements->item($i)),2);
     $checksums[$i % $doc_count]["n"] += 1;
     insert($dests[$i % $doc_count], $inserts[$i % $doc_count], $paiements->item($i));
 }
@@ -62,13 +63,13 @@ function getPointOfInsertion(DOMDocument $doc) {
 
 function getMontant(DOMElement $node) {
     $montant = $node->getElementsByTagName("InstdAmt")->item(0)->nodeValue;
-    return (int) ($montant * 100);
+    return $montant; //(int) ($montant * 1000);
 }
 
 function setStats(DOMDocument $doc, $stats) {
     $tagsCtrlSum = $doc->getElementsByTagName("CtrlSum");
     for ($i = 0; $i < $tagsCtrlSum->count(); $i++) {
-        $tagsCtrlSum->item($i)->nodeValue = $stats['montant'];
+        $tagsCtrlSum->item($i)->nodeValue = $stats['montant']; //sprintf("%0.2d",$stats['montant']/1000);
     }
     $tagsNbOfTxs = $doc->getElementsByTagName("NbOfTxs");
     for ($i = 0; $i < $tagsNbOfTxs->count(); $i++) {
@@ -77,6 +78,10 @@ function setStats(DOMDocument $doc, $stats) {
 }
 
 function flushDoc(DOMDocument $doc, $doc_n, $doc_count) {
+    $tagsMsgId = $doc->getElementsByTagName("MsgId");
+    for ($i = 0; $i < $tagsMsgId->count(); $i++) {
+        $tagsMsgId->item($i)->nodeValue .= "-{$doc_n}";
+    }
     $doc->formatOutput = true;
     $doc->save("gen2_split_{$doc_n}_{$doc_count}.xml");
 }
