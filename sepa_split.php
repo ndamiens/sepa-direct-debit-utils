@@ -31,6 +31,35 @@ foreach ($dests as $dest) {
     $checksums[] = ["montant" => 0, "n" => 0];
 }
 
+// set reqdColltnDt
+$reqdColltnDt = null;
+$creDtTm = null;
+foreach ($doc->getElementsByTagName("ReqdColltnDt") as $elem) {
+    /** @var \DOMElement $elem */
+    $reqdColltnDt = $elem->nodeValue;
+}
+foreach ($doc->getElementsByTagName("CreDtTm") as $elem) {
+    /** @var \DOMElement $elem */
+    $creDtTm = $elem->nodeValue;
+}
+
+error_log("reqdColltnDt = $reqdColltnDt");
+error_log("creDtTm = $creDtTm");
+
+foreach ($dests as $file_n => $dest) {
+    /** @var \DOMDocument $dest */
+    foreach ($dest->getElementsByTagName("ReqdColltnDt") as $elem) {
+        error_log("set $file_n reqdColltnDt = $reqdColltnDt");
+        /** @var \DOMElement $elem */
+        $elem->nodeValue = $reqdColltnDt;
+    }
+    foreach ($dest->getElementsByTagName("CreDtTm") as $elem) {
+        error_log("set $file_n creDtTm = $creDtTm");
+        /** @var \DOMElement $elem */
+        $elem->nodeValue = $creDtTm;
+    }
+}
+
 $paiements = $doc->getElementsByTagName("DrctDbtTxInf");
 $n = $paiements->count();
 echo "$n paiements\n";
