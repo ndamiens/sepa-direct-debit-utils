@@ -39,8 +39,7 @@ $doc_count = count($dests);
 for ($i = 0; $i < $n; $i++) {
     echo "$i\r";
     flush();
-//    echo " {$checksums[$i % $doc_count]["montant"]} += ".getMontant($paiements->item($i))." \n";
-    $checksums[$i % $doc_count]["montant"] = bcadd($checksums[$i % $doc_count]["montant"], getMontant($paiements->item($i)),2);
+    $checksums[$i % $doc_count]["montant"] = bcadd($checksums[$i % $doc_count]["montant"], getMontant($paiements->item($i)), 2);
     $checksums[$i % $doc_count]["n"] += 1;
     insert($dests[$i % $doc_count], $inserts[$i % $doc_count], $paiements->item($i));
 }
